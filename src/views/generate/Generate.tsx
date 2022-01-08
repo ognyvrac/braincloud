@@ -15,17 +15,24 @@ export const Generate = () => {
   }
   return (
     <React.Fragment>
-      <div style={{ height: "85%" }}>
-        <Grid container rowSpacing={2}>
+      <div style={{ height: "60%" }}>
+        <Grid container rowSpacing={2} spacing={6}>
           {ideas.map((idea, index) => (
-            <Grid item xs={2}>
+            <Grid item xs={3}>
               <Idea idea={idea} index={index} isDraggable={false}></Idea>
             </Grid>
           ))}
         </Grid>
       </div>
 
-      <div style={{ width: "376px", margin: "0 auto" }}>
+      <div
+        style={{
+          width: "376px",
+          margin: "0 auto",
+          background: "white",
+          borderRadius: "5px",
+        }}
+      >
         <TextField
           hiddenLabel
           placeholder="Type text here..."

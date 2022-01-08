@@ -3,14 +3,15 @@ import "./App.css";
 import { Navigation } from "./views/navigation/Navigation";
 import { theme } from "./Theme";
 import { Grid } from "@mui/material";
+import { Group } from "./views/group/Group";
+import { Generate } from "./views/generate/Generate";
+import { Vote } from "./views/vote/Vote";
 import { CriteriaComponent } from "./views/vote/components/CriteriaComponent";
-import { PickWinner } from "./views/choose-winner/PickWinner";
-import { ScatterPlot } from "./views/choose-winner/ScatterPlot";
 
 function App() {
   return (
     <ThemeProvider theme={theme}>
-      <div className="App" style={{ background: "#F9B2BE" }}>
+      <div className="App" style={{ background: "#F9B2BE", height: "100%" }}>
         <Grid container spacing={0} style={{ height: "100%" }}>
           <Grid
             item
@@ -26,8 +27,8 @@ function App() {
             <Navigation></Navigation>
           </Grid>
           <Grid item xs={10}>
-            {/* <ScatterPlot width={650} height={500} top={30} right={50} bottom={50} left={50} fill="tomato"/> */}
-            <PickWinner />
+            <div style={{ paddingBottom: "5%" }}>Describe intetions here</div>
+            <Vote/>
           </Grid>
         </Grid>
       </div>

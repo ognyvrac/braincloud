@@ -32,7 +32,7 @@ export const Group = () => {
   function addGroup() {
     setRightGroups([
       ...rightGroups,
-      { groupId: groupId.current, name: "Test", ideasG: [] },
+      { groupId: groupId.current, name: "Group " + groupId.current.toString(), ideasG: [] },
     ]);
     groupId.current = groupId.current + 1;
   }
@@ -190,17 +190,14 @@ export const Group = () => {
   return (
     <React.Fragment>
       <DragDropContext onDragEnd={(result) => onDragEnd(result)}>
-        <div style={{ display: "flex", height: "100%" }}>
-          <div
-            style={{ backgroundColor: "black", width:"50%", display: "flex" }}
-          >
+        <div style={{ display: "flex"}}>
+          <div style={{ width: "50%", display: "flex" }}>
             {leftGroups.map((group, index) => (
-                <DroppableGroup group={group} key={index}></DroppableGroup>
+              <DroppableGroup group={group} key={index}></DroppableGroup>
             ))}
           </div>
           <div
             style={{
-              backgroundColor: "red",
               width: "50%",
               flex: "1",
             }}
@@ -214,10 +211,16 @@ export const Group = () => {
             </Button>
             <Grid container spacing={3}>
               {rightGroups.map((group, index) => (
-                <Grid item xs={4}>
+                <Grid item xs={4} key={index}>
                   <div
                     key={index}
-                    style={{ backgroundColor: "orange", minHeight: "250px"}}
+                    style={{
+                      background:
+                        "radial-gradient(100% 162.15% at 0% 0%, rgba(255, 255, 255, 0.49) 0%, rgba(255, 255, 255, 0.07) 100%)",
+                      boxShadow: "inset 0px 0px 60px rgba(255, 255, 255, 0.25)",
+                      backdropFilter: "blur(12px)",
+                      minHeight: "250px",
+                    }}
                   >
                     {group.name}
                     <DroppableGroup group={group}></DroppableGroup>
@@ -228,8 +231,7 @@ export const Group = () => {
           </div>
         </div>
       </DragDropContext>
-
-      <div style={{ width: "376px", margin: "0 auto" }}>
+      {/* <div style={{ width: "376px", margin: "0 auto" }}>
         <TextField
           hiddenLabel
           placeholder="Type text here..."
@@ -251,7 +253,7 @@ export const Group = () => {
             ),
           }}
         />
-      </div>
+      </div> */}
     </React.Fragment>
   );
 };

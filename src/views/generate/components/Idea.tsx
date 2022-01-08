@@ -15,7 +15,6 @@ export const Idea = ({
     <div
       style={{
         height: "65px",
-        width: "177px",
         display: "flex",
         paddingTop: isDraggable ? "10px" : "",
       }}
@@ -31,8 +30,7 @@ export const Idea = ({
       <div
         style={{
           width: "160px",
-          background:
-            "radial-gradient(100% 162.15% at 0% 0%, rgba(255, 255, 255, 0.49) 0%, rgba(255, 255, 255, 0.07) 100%)",
+          background: "white",
           boxSizing: "border-box",
           boxShadow: "inset 0px 0px 60px rgba(255, 255, 255, 0.25)",
           backdropFilter: "blur(12px)",
