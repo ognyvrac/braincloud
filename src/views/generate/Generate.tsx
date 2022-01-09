@@ -16,9 +16,9 @@ export const Generate = () => {
   return (
     <React.Fragment>
       <div style={{ height: "60%" }}>
-        <Grid container rowSpacing={2} spacing={6}>
+        <Grid container rowSpacing={2} spacing={3}>
           {ideas.map((idea, index) => (
-            <Grid item xs={3}>
+            <Grid item xs={2}>
               <Idea idea={idea} index={index} isDraggable={false}></Idea>
             </Grid>
           ))}

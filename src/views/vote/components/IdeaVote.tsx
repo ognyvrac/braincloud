@@ -1,51 +1,50 @@
-import React, { useState } from "react";
-import { Draggable } from "react-beautiful-dnd";
-import { IdeaType } from "../../../model/AppTypes";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faThumbsUp } from "@fortawesome/free-solid-svg-icons";
+import { IdeaVoteType } from "../Vote";
+import { Idea } from "../../generate/components/Idea";
 
-export const IdeaVote = ({
-  idea,
-  index,
-}: {
-  idea: IdeaType;
+interface IIdeaVoteProps {
   index: number;
-}) => {
-  const element = (
-    <React.Fragment>
-      <div
-        style={{
-          height: "65px",
-          display: "flex",
-          marginLeft: "5px",
-        }}
-      >
-        <div
-          style={{
-            width: "10%",
-            background:
-              "linear-gradient(360deg, rgba(211, 82, 103, 0.8) 0%, rgba(133, 28, 84, 0.7) 49.48%, rgba(91, 20, 103, 0.8) 100%)",
-            borderRadius: "0px 0px 0px 15px",
-          }}
-        ></div>
-        <div
-          style={{
-            width: "90%",
-            background: "yellow",
-            // "radial-gradient(100% 162.15% at 0% 0%, rgba(255, 255, 255, 0.49) 0%, rgba(255, 255, 255, 0.07) 100%)",
-            boxSizing: "border-box",
-            boxShadow: "inset 0px 0px 60px rgba(255, 255, 255, 0.25)",
-            backdropFilter: "blur(12px)",
-            border: "1px solid rgba(255, 255, 255, 0.2)",
-            borderRadius: "0px 0px 15px 0px",
-            textAlign: "left",
-            flex: "1",
-          }}
-        >
-          <div style={{ marginLeft: "5px" }}>{idea.content}</div>
-        </div>
+  idea: IdeaVoteType;
+  availableVotes: number;
+  handleVote: (idea: IdeaVoteType) => void;
+}
+
+function handleVoteIcons(votes: number) {
+  let icons = [];
+  for (let i = 0; i < votes; i++) {
+    icons.push(
+      <FontAwesomeIcon
+        key={i}
+        icon={faThumbsUp}
+        color="#D35267"
+        style={{ float: "left", marginLeft: "5px" }}
+      />
+    );
+  }
+
+  return icons;
+}
+
+export const IdeaVote = (props: IIdeaVoteProps) => {
+  const { index, idea, availableVotes, handleVote } = props;
+  return (
+    <>
+      <div style={{ height: "22px", marginLeft: "5px" }} key={index}>
+        {availableVotes < 1 ? null : (
+          <FontAwesomeIcon
+            icon={faThumbsUp}
+            color="#66707C"
+            onClick={() => handleVote(idea)}
+            style={{ float: "right" }}
+          />
+        )}
+
+        {handleVoteIcons(idea.votes)}
       </div>
-    </React.Fragment>
+      <div>
+        <Idea idea={idea.idea} index={index} isDraggable={false}></Idea>
+      </div>
+    </>
   );
-  return <React.Fragment>{element}</React.Fragment>;
 };

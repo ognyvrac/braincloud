@@ -11,7 +11,7 @@ export const PickWinner = () => {
     { ideaId: 5, content: "Dea" },
   ];
   return (
-    <div style={{ width: "40%" }}>
+    <div>
       <h2>Select a winner</h2>
       <div
         style={{
@@ -26,11 +26,12 @@ export const PickWinner = () => {
             key={idea.ideaId}
             style={{
               height: "60px",
-              background: "red",
+              background: "white",
               textAlign: "center",
               lineHeight: "60px",
               borderRadius: "15px",
-              border: selectedId === idea.ideaId ? "1px solid blue" : "1px solid #DADADA"
+              boxShadow: "0px 4px 4px rgba(0, 0, 0, 0.25)",
+              border: selectedId === idea.ideaId ? "1px solid #5B1467" : "1px solid #DADADA"
             }}
             onClick={() => setSelectedId(idea.ideaId)}
           >{idea.content}</div>

@@ -40,7 +40,7 @@ export const Idea = ({
           flex: "1",
         }}
       >
-        <div style={{ marginLeft: "5px" }}>{idea.content}</div>
+        <div style={{ marginLeft: "5px"}}>{idea.content}</div>
       </div>
     </div>
   );

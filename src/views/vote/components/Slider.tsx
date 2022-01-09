@@ -38,7 +38,7 @@ export const Slider = (props: ISliderProps) => {
         </div>
       </div>
       <MUISlider
-        style={{width: "250px"}}
+        style={{minWidth: "250px"}}
         value={value}
         color="secondary"
         aria-label="Default"

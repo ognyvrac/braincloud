@@ -4,7 +4,7 @@ import { Button } from "@mui/material";
 
 export const ShowWinner = () => {
   return (
-    <div style={{width: "40%", textAlign: "center"}}>
+    <div style={{textAlign: "center", paddingTop: "3em"}}>
       <FontAwesomeIcon icon={faTrophy} transform="grow-80" color="#851C54" style={{paddingBottom: "20px"}}/>
       <h2>Winner: Test</h2>
       <div style={{ display: "flex" }}>
