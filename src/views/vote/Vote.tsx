@@ -1,63 +1,112 @@
 import { Grid } from "@mui/material";
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { IdeaType } from "../../model/AppTypes";
 import { CriteriaComponent } from "./components/CriteriaComponent";
 import { IdeaVote } from "./components/IdeaVote";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faArrowRight } from "@fortawesome/free-solid-svg-icons";
+import { useNavigate } from "react-router-dom";
 
 export type IdeaVoteType = {
   idea: IdeaType;
   votes: number;
   criteria1: number;
   criteria2: number;
+  groupId: number;
 };
 
 type GroupVoteType = {
+  id: number;
   name: string;
   ideas: IdeaVoteType[];
 };
 
 export const Vote = () => {
-  const [inputValue, setInputValues] = useState("");
   const [ideas, setIdeas] = useState([] as IdeaVoteType[]);
   const [availableVotes, setAvailableVotes] = useState(4);
-  const [groups, setGroups] = useState<GroupVoteType[]>([
-    {
-      name: "Test",
-      ideas: [
-        {
-          idea: { ideaId: 69, content: "vargal" },
-          votes: 0,
-          criteria1: -1,
-          criteria2: -1,
-        },
-        {
-          idea: { ideaId: 70, content: "132" },
-          votes: 0,
-          criteria1: -1,
-          criteria2: -1,
-        },
-      ],
-    },
-    {
-      name: "Bob",
-      ideas: [
-        {
-          idea: { ideaId: 66, content: "meme" },
-          votes: 0,
-          criteria1: -1,
-          criteria2: -1,
-        },
-        {
-          idea: { ideaId: 79, content: "shumen" },
-          votes: 0,
-          criteria1: -1,
-          criteria2: -1,
-        },
-      ],
-    },
-  ]);
+  const [groups, setGroups] = useState<GroupVoteType[]>([]);
   const selectedIdea = useRef<IdeaVoteType>();
   const [open, setOpen] = useState(false);
+  let navigate = useNavigate();
+
+  useEffect(() => {
+    async function getGroups() {
+      const groupsResponse = await fetch("http://127.0.0.1:8000/api/groups", {
+        method: "GET",
+        mode: "cors",
+        headers: {
+          Accept: "application/json",
+        },
+      });
+
+      let functionGroups: GroupVoteType[] = [];
+
+      await groupsResponse.json().then((groups: any[]) => {
+        groups.forEach((group: any) => {
+          if (group.name !== "No group") {
+            functionGroups.push({
+              id: group.id,
+              name: group.name,
+              ideas: [],
+            });
+          }
+        });
+      });
+
+      const ideasResponse = await fetch("http://127.0.0.1:8000/api/ideas", {
+        method: "GET",
+        mode: "cors",
+        headers: {
+          Accept: "application/json",
+        },
+      });
+
+      let functionIdeas: IdeaVoteType[] = [];
+      let functionNoGroupIdeas: IdeaVoteType[] = [];
+
+      await ideasResponse.json().then((ideas: any[]) => {
+        ideas.forEach((idea: any) => {
+          if (idea.group_id === 1) {
+            functionNoGroupIdeas.push({
+              idea: {
+                id: idea.id,
+                content: idea.content,
+              },
+              votes: 0,
+              criteria1: -1,
+              criteria2: -1,
+              groupId: idea.group_id,
+            });
+          } else {
+            functionIdeas.push({
+              idea: {
+                id: idea.id,
+                content: idea.content,
+              },
+              votes: 0,
+              criteria1: -1,
+              criteria2: -1,
+              groupId: idea.group_id,
+            });
+          }
+        });
+      });
+
+      setIdeas(functionNoGroupIdeas);
+
+      setGroups(
+        functionGroups.map((group) => {
+          functionIdeas.forEach((idea) => {
+            if (idea.groupId === group.id) {
+              group.ideas.push(idea);
+            }
+          });
+          return group;
+        })
+      );
+    }
+    getGroups();
+  }, []);
 
   const tryFindGroupOfIdea = (idea: IdeaVoteType) => {
     let group: GroupVoteType | undefined;
@@ -78,11 +127,24 @@ export const Vote = () => {
     criteria2: number
   ) => {
     if (criteria1 !== -1 && criteria2 !== -1) {
+      const formData = new FormData();
+      formData.append("criteria1", criteria1.toString());
+      formData.append("criteria2", criteria2.toString());
+
+      fetch(
+        "http://127.0.0.1:8000/api/ideas/criteria/votes_first/" + idea.idea.id,
+        {
+          method: "POST",
+          mode: "cors",
+          body: formData,
+        }
+      );
+
       const group = tryFindGroupOfIdea(idea);
       if (group === undefined) {
         setIdeas(
           ideas.map((ideaMap) =>
-            ideaMap.idea.ideaId === idea.idea.ideaId
+            ideaMap.idea.id === idea.idea.id
               ? {
                   ...ideaMap,
                   votes: idea.votes + 1,
@@ -99,7 +161,7 @@ export const Vote = () => {
               ? {
                   ...g,
                   ideas: g.ideas.map((i) =>
-                    idea.idea.ideaId === i.idea.ideaId
+                    idea.idea.id === i.idea.id
                       ? {
                           ...i,
                           votes: i.votes + 1,
@@ -123,11 +185,16 @@ export const Vote = () => {
     if (idea.criteria1 === -1 && idea.criteria2 === -1) {
       setOpen(true);
     } else {
+      fetch("http://127.0.0.1:8000/api/ideas/votes_first/" + idea.idea.id, {
+        method: "POST",
+        mode: "cors",
+      });
+
       const group = tryFindGroupOfIdea(idea);
       if (group === undefined) {
         setIdeas(
           ideas.map((ideaMap) =>
-            ideaMap.idea.ideaId === idea.idea.ideaId
+            ideaMap.idea.id === idea.idea.id
               ? { ...ideaMap, votes: idea.votes + 1 }
               : ideaMap
           )
@@ -139,7 +206,7 @@ export const Vote = () => {
               ? {
                   ...g,
                   ideas: g.ideas.map((i) =>
-                    idea.idea.ideaId === i.idea.ideaId
+                    idea.idea.id === i.idea.id
                       ? { ...i, votes: i.votes + 1 }
                       : i
                   ),
@@ -154,7 +221,7 @@ export const Vote = () => {
 
   return (
     <React.Fragment>
-      <div>
+      <div style={{minHeight: "80vh"}}>
         <Grid container rowSpacing={2} spacing={8}>
           {ideas.map((idea, index) => (
             <Grid item xs={3} key={index}>
@@ -199,6 +266,13 @@ export const Vote = () => {
             onClose={handleCloseVote}
           />
         )}
+      </div>
+      <div style={{ textAlign: "center", paddingTop: "1em" }}>
+        <FontAwesomeIcon
+          icon={faArrowRight}
+          transform="grow-5"
+          onClick={() => navigate("/choose")}
+        />
       </div>
     </React.Fragment>
   );

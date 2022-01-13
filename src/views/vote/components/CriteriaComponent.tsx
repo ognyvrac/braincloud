@@ -12,12 +12,12 @@ interface ICriteriaProps {
 
 export const CriteriaComponent = (props: ICriteriaProps) => {
   const { idea, open, onClose } = props;
-  const [criteria1, setCriteria1] = useState(50);
-  const [criteria2, setCriteria2] = useState(50);
+  const [criteria1, setCriteria1] = useState(2);
+  const [criteria2, setCriteria2] = useState(2);
 
   const resetCriteria = () => {
-    setCriteria1(50);
-    setCriteria2(50);
+    setCriteria1(2);
+    setCriteria2(2);
   };
 
   const handleClose = () => {
@@ -41,14 +41,6 @@ export const CriteriaComponent = (props: ICriteriaProps) => {
   return (
     <React.Fragment>
       <Dialog onClose={handleClose} open={open}>
-        {/* <div
-          style={{
-            height: "10%",
-            width: "100%",
-            background:
-              "linear-gradient(90deg, rgba(211, 82, 103, 0.8) 0%, rgba(133, 28, 84, 0.7) 49.48%, rgba(91, 20, 103, 0.8) 100%)",
-          }}
-        ></div> */}
         <div style={{ paddingLeft: "10px", paddingRight: "10px" }}>
           <h3 style={{ textAlign: "left" }}>{idea.idea.content}</h3>
           <Slider value={criteria1} handleCriteria={handleCriteria1Slider} />

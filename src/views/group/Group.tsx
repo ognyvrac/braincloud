@@ -1,13 +1,15 @@
 import { Button, Grid, TextField } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
-import React, { useRef, useState } from "react";
-import { GroupType } from "../../model/AppTypes";
+import React, { useEffect, useRef, useState } from "react";
+import { GroupType, IdeaType } from "../../model/AppTypes";
 import { DragDropContext, DropResult } from "react-beautiful-dnd";
 import { ensure } from "../../ResultScripts";
 import { DroppableGroup } from "./components/DroppableGroup";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faArrowRight } from "@fortawesome/free-solid-svg-icons";
+import { useNavigate } from "react-router-dom";
 
 export const Group = () => {
-  const [inputValue, setInputValues] = useState("");
   const [leftGroups, setLeftGroups] = useState<GroupType[]>([
     {
       groupId: 1,
@@ -26,43 +28,48 @@ export const Group = () => {
     },
   ]);
   const [rightGroups, setRightGroups] = useState<GroupType[]>([]);
-  const ideaId = useRef(1);
   const groupId = useRef(5);
+  let navigate = useNavigate();
 
   function addGroup() {
     setRightGroups([
       ...rightGroups,
-      { groupId: groupId.current, name: "Group " + groupId.current.toString(), ideasG: [] },
+      {
+        groupId: groupId.current,
+        name: "Group " + groupId.current.toString(),
+        ideasG: [],
+      },
     ]);
     groupId.current = groupId.current + 1;
   }
 
-  function submitIdea() {
-    let smallestGroup = {} as GroupType;
-    let smallestLength = 1000;
-    if (inputValue !== "") {
-      leftGroups.forEach((group) => {
-        if (group.ideasG.length < smallestLength) {
-          smallestLength = group.ideasG.length;
-          smallestGroup = group;
-        }
-      });
-      setLeftGroups(
-        leftGroups.map((group) =>
-          group.groupId === smallestGroup.groupId
-            ? {
-                ...group,
-                ideasG: [
-                  ...group.ideasG,
-                  { ideaId: ideaId.current, content: inputValue },
-                ],
-              }
-            : group
-        )
-      );
-      ideaId.current = ideaId.current + 1;
-      setInputValues("");
-    }
+  async function submitGroups() {
+    setRightGroups(rightGroups.filter((group) => group.ideasG.length > 0));
+    let noGroupIdeas: IdeaType[] = [];
+
+    leftGroups.forEach((group) => {
+      noGroupIdeas = noGroupIdeas.concat(group.ideasG);
+    });
+
+    const noGroup: GroupType = {
+      groupId: 99,
+      name: "No group",
+      ideasG: noGroupIdeas,
+    };
+
+    let groupsToSubmit = rightGroups;
+    groupsToSubmit.push(noGroup);
+
+    const formData = new FormData();
+    formData.append("groups", JSON.stringify(groupsToSubmit));
+
+    await fetch("http://127.0.0.1:8000/api/ideas/groups", {
+      method: "POST",
+      mode: "cors",
+      body: formData,
+    });
+
+    navigate("/vote");
   }
 
   /// Handles dragging
@@ -97,7 +104,7 @@ export const Group = () => {
 
     const idea = ensure(
       groupToRemoveFrom.ideasG.find(
-        (idea) => idea.ideaId.toString() === draggableId
+        (idea) => idea.id.toString() === draggableId
       )
     );
 
@@ -187,10 +194,50 @@ export const Group = () => {
     }
   }
 
+  useEffect(() => {
+    async function getIdeas() {
+      const response = await fetch("http://127.0.0.1:8000/api/ideas", {
+        method: "GET",
+        mode: "cors",
+        headers: {
+          Accept: "application/json",
+        },
+      });
+
+      let functionGroups: GroupType[] = leftGroups;
+
+      response.json().then((e: any[]) => {
+        e.forEach((element: any) => {
+          let smallestGroup = {} as GroupType;
+          let smallestLength = 1000;
+          functionGroups.forEach((group) => {
+            if (group.ideasG.length < smallestLength) {
+              smallestLength = group.ideasG.length;
+              smallestGroup = group;
+            }
+          });
+          functionGroups = functionGroups.map((group) =>
+            group.groupId === smallestGroup.groupId
+              ? {
+                  ...group,
+                  ideasG: [
+                    ...group.ideasG,
+                    { id: element.id, content: element.content },
+                  ],
+                }
+              : group
+          );
+        });
+        setLeftGroups(functionGroups);
+      });
+    }
+    getIdeas();
+  }, []);
+
   return (
     <React.Fragment>
       <DragDropContext onDragEnd={(result) => onDragEnd(result)}>
-        <div style={{ display: "flex"}}>
+        <div style={{ display: "flex", minHeight: "80vh" }}>
           <div style={{ width: "50%", display: "flex" }}>
             {leftGroups.map((group, index) => (
               <DroppableGroup group={group} key={index}></DroppableGroup>
@@ -231,29 +278,13 @@ export const Group = () => {
           </div>
         </div>
       </DragDropContext>
-      {/* <div style={{ width: "376px", margin: "0 auto" }}>
-        <TextField
-          hiddenLabel
-          placeholder="Type text here..."
-          multiline
-          rows={7}
-          color="secondary"
-          fullWidth
-          value={inputValue}
-          onChange={(e) => setInputValues(e.target.value)}
-          InputProps={{
-            endAdornment: (
-              <Button
-                style={{ marginTop: "35%" }}
-                color="secondary"
-                onClick={submitIdea}
-              >
-                Submit
-              </Button>
-            ),
-          }}
+      <div style={{ textAlign: "center", paddingTop: "1em" }}>
+        <FontAwesomeIcon
+          icon={faArrowRight}
+          transform="grow-5"
+          onClick={submitGroups}
         />
-      </div> */}
+      </div>
     </React.Fragment>
   );
 };

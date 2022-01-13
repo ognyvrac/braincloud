@@ -1,8 +1,9 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faThumbsUp } from "@fortawesome/free-solid-svg-icons";
+import { IdeaType } from "../../model/AppTypes";
 
-export const Leaderboard = () => {
+export const Leaderboard = ({ ideas }: { ideas: IdeaType[] }) => {
   return (
     <React.Fragment>
       <div>
@@ -43,15 +44,17 @@ export const Leaderboard = () => {
             boxShadow: "inset 0px 0px 60px rgba(255, 255, 255, 0.25)",
             backdropFilter: "blur(12px)",
             borderRadius: "0px 0px 15px 15px",
-            paddingBottom: "2vh"
+            paddingBottom: "2vh",
           }}
         >
-          <div>1. Create prototype</div>
-          <div>2</div>
-          <div>2. Create prototype</div>
-          <div>2</div>
-          <div>3. Create prototype</div>
-          <div>2</div>
+          {ideas.map((idea, index) => {
+            return (
+              <>
+                <div>{index+1 + ". " + idea.content}</div>
+                <div>{idea.votes}</div>
+              </>
+            );
+          })}
         </div>
       </div>
     </React.Fragment>

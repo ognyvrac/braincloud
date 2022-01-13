@@ -15,7 +15,7 @@ export const DroppableGroup = ({ group }: { group: GroupType }) => {
           >
             {group.ideasG.map((idea, index) => (
               <Idea
-                key={idea.ideaId}
+                key={idea.id}
                 idea={idea}
                 index={index}
                 isDraggable={true}

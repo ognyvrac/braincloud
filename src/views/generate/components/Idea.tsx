@@ -47,7 +47,7 @@ export const Idea = ({
   return (
     <React.Fragment>
       {isDraggable ? (
-        <Draggable draggableId={idea.ideaId.toString()} index={index}>
+        <Draggable draggableId={idea.id.toString()} index={index}>
           {(provided) => (
             <div
               {...provided.draggableProps}

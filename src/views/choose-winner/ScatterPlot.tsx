@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import * as d3 from "d3";
-import { PlotData } from "../../model/AppTypes";
+import { IdeaType, PlotData } from "../../model/AppTypes";
 
 interface IScatterPlotProps {
   width: number;
@@ -13,19 +13,62 @@ interface IScatterPlotProps {
 }
 
 export const ScatterPlot = (props: IScatterPlotProps) => {
-  let data: PlotData[] = [
-    { idea: "Hire UX designer", criteriax: 4, criteriay: 2 },
-    { idea: "Fire boss", criteriax: 1, criteriay: 1 },
-    { idea: "Lorem", criteriax: 1, criteriay: 5 },
-  ];
-  let criteria1 = "Innovation";
-  let criteria2 = "Fun";
-
   useEffect(() => {
-    draw();
-  });
+    async function getCriteria() {
+      const response = await fetch("http://127.0.0.1:8000/api/sessions", {
+        method: "GET",
+        mode: "cors",
+        headers: {
+          Accept: "application/json",
+        },
+      });
 
-  const draw = () => {
+      let criteria1 = ""
+      let criteria2 = ""
+
+      await response.json().then((session: any) => {
+        criteria1 = session.criteria1
+        criteria2 = session.criteria2
+      });
+
+      const responseIdeas = await fetch(
+        "http://127.0.0.1:8000/api/ideas/votes_first",
+        {
+          method: "GET",
+          mode: "cors",
+          headers: {
+            Accept: "application/json",
+          },
+        }
+      );
+
+      let functionIdeas: IdeaType[] = [];
+
+      await responseIdeas.json().then((ideasJson: any[]) => {
+        ideasJson.forEach((idea: any) => {
+          functionIdeas.push({
+            id: idea.id,
+            content: idea.content,
+            votes: idea.votes_first,
+            criteria1: idea.criteria1,
+            criteria2: idea.criteria2
+          });
+        });
+      });
+
+      draw(criteria1, criteria2, functionIdeas);
+    }
+    getCriteria();
+  }, []);
+
+  const handleUndefined = (number: number | undefined) => {
+    if (number === undefined) {
+      return 0;
+    }
+    return number;
+  };
+
+  const draw = (criteria1: string, criteria2: string, data: IdeaType[]) => {
     const width = props.width - props.left - props.right;
     const height = props.height - props.top - props.bottom;
 
@@ -83,10 +126,10 @@ export const ScatterPlot = (props: IScatterPlotProps) => {
     dots
       .append("circle")
       .attr("cx", (d) => {
-        return x(d.criteriax);
+        return x(handleUndefined(d.criteria1));
       })
       .attr("cy", (d) => {
-        return y(d.criteriay);
+        return y(handleUndefined(d.criteria2));
       })
       .attr("r", 5)
       .style("fill", props.fill)
@@ -97,13 +140,13 @@ export const ScatterPlot = (props: IScatterPlotProps) => {
       .append("text")
       .style("font-size", "15px")
       .text((d) => {
-        return d.idea;
+        return d.content;
       })
       .attr("x", (d) => {
-        return x(d.criteriax + 0.03);
+        return x(handleUndefined(d.criteria1) + 0.03);
       })
       .attr("y", (d) => {
-        return y(d.criteriay + 0.03);
+        return y(handleUndefined(d.criteria2) + 0.03);
       });
   };
   return <div className="basicScatterChart" />;
